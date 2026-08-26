@@ -40,8 +40,8 @@ export default {
                 <div class="level" v-if="level">
                     <h1>{{ level.name }}</h1>
                     <LevelAuthors :author="level.author" :creators="level.creators" :verifier="level.verifier"></LevelAuthors>
-<iframe v-if="level.verification.includes('youtube.com') || level.verification.includes('youtu.be')" :src="`https://www.youtube.com/embed/${embed(level.verification)}`" frameborder="0" allowfullscreen style="width: 100%; height: 100%;"></iframe>
-<img v-else :src="level.verification" :alt="level.name" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+<iframe v-if="level.verification && (level.verification.includes('youtube.com') || level.verification.includes('youtu.be'))" :src="`https://www.youtube.com/embed/${embed(level.verification)}`" frameborder="0" allowfullscreen style="width: 100%; height: 100%;"></iframe>
+<img v-else-if="level.verification" :src="level.verification" :alt="level.name" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
                     <ul class="stats">
                         <li>
                             <div class="type-title-sm">Points when completed</div>
