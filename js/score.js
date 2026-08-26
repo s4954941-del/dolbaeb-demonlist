@@ -1,4 +1,12 @@
-var customPoints = {
+/**
+ * Numbers of decimal digits to round to
+ */
+const scale = 3;
+
+/**
+ * Фиксированные очки за места (изменяй значения под свой Demonlist)
+ */
+const customPoints = {
     1: 300,
     2: 250,
     3: 200,
@@ -6,26 +14,41 @@ var customPoints = {
     5: 100
 };
 
+/**
+ * Calculate the score awarded when having a certain percentage on a list level
+ * @param {number} rank position on the list
+ * @param {number} percent Percentage of completion
+ * @param {number} minPercent Minimum percentage required
+ * @returns {number}
+ */
 export function score(rank, percent, minPercent) {
-    var r = parseInt(rank) || 1;
-    var p = (percent !== undefined && percent !== null) ? Number(percent) : 100;
-    var minP = (minPercent !== undefined && minPercent !== null) ? Number(minPercent) : 100;
-
-    if (r > 150 || p < minP) {
+    if (rank > 150) {
+        return 0;
+    }
+    if (rank > 75 && percent < 100) {
         return 0;
     }
 
-    var baseScore = customPoints[r];
-    if (baseScore === undefined) {
-        baseScore = Math.max(0, -24.9975 * Math.pow(r - 1, 0.4) + 200);
+    // Берём кастомные поинты, а если места нет в списке — считаем по формуле
+    let score = customPoints[rank];
+    if (score === undefined) {
+        score = (-24.9975 * Math.pow(rank - 1, 0.4) + 200);
     }
 
-    if (p >= 100) {
-        return Math.round(baseScore * 1000) / 1000;
+    // Учитываем процент прохождения
+    score *= ((percent - (minPercent - 1)) / (100 - (minPercent - 1)));
+    score = Math.max(0, score);
+
+    if (percent != 100) {
+        return round(score - (score / 3));
     }
 
-    var progressRatio = 0.25 + 0.75 * Math.pow((p - minP) / (100 - minP), 1.2);
-    var finalScore = baseScore * progressRatio;
+    return round(score);
+}
 
-    return Math.round(finalScore * 1000) / 1000;
+function round(num) {
+    if (!StandardMath.ROUND_TO_STEP) {
+        return Math.round(num * Math.pow(10, scale)) / Math.pow(10, scale);
+    }
+    return Math.round(num * StandardMath.ROUND_TO_STEP) / StandardMath.ROUND_TO_STEP;
 }
