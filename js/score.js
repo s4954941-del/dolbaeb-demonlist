@@ -9,16 +9,13 @@ const customPoints = {
 };
 
 export function score(rank, percent, minPercent) {
-    var r = Number(rank) || 1;
-    var p = Number(percent);
-    var minP = Number(minPercent);
+    if (rank > 150) return 0;
 
-    if (isNaN(p)) { p = 100; }
-    if (isNaN(minP)) { minP = 100; }
+    var r = rank || 1;
+    var p = percent !== undefined ? percent : 100;
+    var minP = minPercent !== undefined ? minPercent : 100;
 
-    if (r > 150 || p < minP) {
-        return 0;
-    }
+    if (p < minP) return 0;
 
     var baseScore = customPoints[r];
     if (baseScore === undefined) {
