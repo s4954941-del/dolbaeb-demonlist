@@ -39,9 +39,9 @@ export function score(rank, percent, minPercent) {
         score = (-24.9975 * Math.pow(rank - 1, 0.4) + 200);
     }
 
-    // Учитываем процент прохождения
-    score = score * ((percent - (minPercent - 1)) / (100 - (minPercent - 1)));
-    score = Math.max(0, score);
+    // Учитываем процент прохождения (старт с 25% очков на минимальном проценте)
+        const progressRatio = 0.25 + 0.75 * Math.pow((percent - minPercent) / (100 - minPercent), 1.2);
+        score = score * progressRatio;
 
     if (percent != 100) {
         return round(score - score / 3);
