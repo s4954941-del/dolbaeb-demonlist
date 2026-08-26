@@ -1,6 +1,4 @@
-const scale = 3;
-
-const customPoints = {
+var customPoints = {
     1: 300,
     2: 250,
     3: 200,
@@ -9,13 +7,13 @@ const customPoints = {
 };
 
 export function score(rank, percent, minPercent) {
-    if (rank > 150) return 0;
+    var r = parseInt(rank) || 1;
+    var p = (percent !== undefined && percent !== null) ? Number(percent) : 100;
+    var minP = (minPercent !== undefined && minPercent !== null) ? Number(minPercent) : 100;
 
-    var r = rank || 1;
-    var p = percent !== undefined ? percent : 100;
-    var minP = minPercent !== undefined ? minPercent : 100;
-
-    if (p < minP) return 0;
+    if (r > 150 || p < minP) {
+        return 0;
+    }
 
     var baseScore = customPoints[r];
     if (baseScore === undefined) {
@@ -23,11 +21,11 @@ export function score(rank, percent, minPercent) {
     }
 
     if (p >= 100) {
-        return Number(baseScore.toFixed(scale));
+        return Math.round(baseScore * 1000) / 1000;
     }
 
     var progressRatio = 0.25 + 0.75 * Math.pow((p - minP) / (100 - minP), 1.2);
     var finalScore = baseScore * progressRatio;
 
-    return Number(finalScore.toFixed(scale));
+    return Math.round(finalScore * 1000) / 1000;
 }
