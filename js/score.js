@@ -4,6 +4,17 @@
 const scale = 3;
 
 /**
+ * Словарь со своими фиксированными поинтами (номер места: очки).
+ * Заполни под свои нужды:
+ */
+const customPoints = {
+    1: 300,   // Для 1 места
+    2: 250,   // Для 2 места
+    3: 200,   // Для 3 места
+    // Добавляй свои места по аналогии: 4: 180, 5: 160 и т.д.
+};
+
+/**
  * Calculate the score awarded when having a certain percentage on a list level
  * @param {Number} rank Position on the list
  * @param {Number} percent Percentage of completion
@@ -18,15 +29,18 @@ export function score(rank, percent, minPercent) {
         return 0;
     }
 
-    // Old formula
-    /*
-    let score = (100 / Math.sqrt((rank - 1) / 50 + 0.444444) - 50) *
-        ((percent - (minPercent - 1)) / (100 - (minPercent - 1)));
-    */
-    // New formula
-    let score = (-24.9975*Math.pow(rank-1, 0.4) + 200) *
-        ((percent - (minPercent - 1)) / (100 - (minPercent - 1)));
+    let score;
 
+    // 1. Проверяем, заданы ли свои поинты вручную для этого места
+    if (customPoints[rank] !== undefined) {
+        score = customPoints[rank];
+    } else {
+        // 2. Если ручных поинтов нет — считаем по формуле демонлиста
+        score = (-24.9975 * Math.pow(rank - 1, 0.4) + 200);
+    }
+
+    // Учитываем процент прохождения
+    score = score * ((percent - (minPercent - 1)) / (100 - (minPercent - 1)));
     score = Math.max(0, score);
 
     if (percent != 100) {
