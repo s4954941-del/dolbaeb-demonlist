@@ -1,5 +1,5 @@
 {
-    "id": 57436521,
+    "id": 10565740,
     "name": "Bloodbath",
     "author": "Riot",
     "creators": ["Weoweoteo", "Vermillion", "Michigun", "Evasium", "Crack", "ASonicMen", "Etzer", "Havok", "Giron", "Ggb0y"],
@@ -9,16 +9,4 @@
     "password": "Not Copyable",
     "records": [
         {
-            "user": "Sample_Victor_1",
-            "link": "https://www.youtube.com/watch?v=MgJeijBGKHU",
-            "percent": 100,
-            "hz": 360
-        },
-        {
-            "user": "Sample_Victor_2",
-            "link": "https://www.youtube.com/watch?v=MgJeijBGKHU",
-            "percent": 100,
-            "hz": 120
-        }
-    ]
-}
+            
