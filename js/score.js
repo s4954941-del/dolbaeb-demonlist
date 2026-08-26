@@ -5,64 +5,49 @@ const scale = 3;
 
 /**
  * Словарь со своими фиксированными поинтами (номер места: очки).
- * Заполни под свои нужды:
  */
 const customPoints = {
-    1: 300,   // Для 1 места
-    2: 250,   // Для 2 места
-    3: 200,   // Для 3 места
-    // Добавляй свои места по аналогии: 4: 180, 5: 160 и т.д.
+    1: 300, // для 1 места
+    2: 250, // для 2 места
+    3: 200, // для 3 места
+    4: 150, // для 4 места
+    5: 100  // для 5 места
 };
 
 /**
  * Calculate the score awarded when having a certain percentage on a list level
- * @param {Number} rank Position on the list
- * @param {Number} percent Percentage of completion
- * @param {Number} minPercent Minimum percentage required
- * @returns {Number}
+ * @param {number} rank position on the list
+ * @param {number} percent Percentage of completion
+ * @param {number} minPercent Minimum percentage required
+ * @returns {number}
  */
-export function score(rank, percent, minPercent) {
+export function score(rank, percent = 100, minPercent = 100) {
     if (rank > 150) {
         return 0;
     }
-    if (rank > 75 && percent < 100) {
+
+    // Обработка некорректных или пропущенных значений процента
+    percent = Number(percent) || 100;
+    minPercent = Number(minPercent) || 100;
+
+    if (percent < minPercent) {
         return 0;
     }
 
-    let score;
-
-    // 1. Проверяем, заданы ли свои поинты вручную для этого места
-    if (customPoints[rank] !== undefined) {
-        score = customPoints[rank];
-    } else {
-        // 2. Если ручных поинтов нет — считаем по формуле демонлиста
-        score = (-24.9975 * Math.pow(rank - 1, 0.4) + 200);
+    // 1. Получаем базовые поинты за уровень (если места нет в словаре, считаем по стандартной формуле)
+    let baseScore = customPoints[rank];
+    if (baseScore === undefined) {
+        baseScore = Math.max(0, -24.9975 * Math.pow(rank - 1, 0.4) + 200);
     }
 
-    // Учитываем процент прохождения (старт с 25% очков на минимальном проценте)
-        const progressRatio = 0.25 + 0.75 * Math.pow((percent - minPercent) / (100 - minPercent), 1.2);
-        score = score * progressRatio;
-
-    if (percent != 100) {
-        return round(score - score / 3);
+    // 2. Если пройдено на 100% (или это верификация) — даём полный балл
+    if (percent >= 100) {
+        return Number(baseScore.toFixed(scale));
     }
 
-    return Math.max(round(score), 0);
-}
+    // 3. Расчёт прогресса (на минимальном проценте даём ровно 25% от базового балла, т.е. 75 очков для 1 места)
+    const progressRatio = 0.25 + 0.75 * Math.pow((percent - minPercent) / (100 - minPercent), 1.2);
+    const finalScore = baseScore * progressRatio;
 
-export function round(num) {
-    if (!('' + num).includes('e')) {
-        return +(Math.round(num + 'e+' + scale) + 'e-' + scale);
-    } else {
-        var arr = ('' + num).split('e');
-        var sig = '';
-        if (+arr[1] + scale > 0) {
-            sig = '+';
-        }
-        return +(
-            Math.round(+arr[0] + 'e' + sig + (+arr[1] + scale)) +
-            'e-' +
-            scale
-        );
-    }
+    return Number(finalScore.toFixed(scale));
 }
