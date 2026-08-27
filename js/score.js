@@ -39,14 +39,19 @@ export function score(rank, percent, minPercent) {
         score = (-24.9975 * Math.pow(rank - 1, 0.4) + 200);
     }
 
-    // На 41% (minPercent) даёт 25% от полных поинтов (75 для 1 места)
-        const progressRatio = 0.25 + 0.75 * Math.pow((percent - minPercent) / (100 - minPercent), 1.2);
-        score = score * progressRatio;
-    if (percent != 100) {
-        return round(score - score / 3);
+    // 3. Если 100% — отдаем полный балл
+    if (percent === 100) {
+        return Math.max(round(score), 0);
     }
 
-    return Math.max(round(score), 0);
+    // 4. Если меньше 100% — считаем по формуле с картинки (корень из 5)
+    const pMax = score;
+    const pMin = score * 0.25; // 25% от максимальных очков за минимальный %
+
+    const progressRatio = Math.pow((percent - minPercent) / (100 - minPercent), Math.sqrt(5));
+    const finalScore = pMin + (pMax - pMin) * progressRatio;
+
+    return Math.max(round(finalScore), 0);
 }
 
 export function round(num) {
