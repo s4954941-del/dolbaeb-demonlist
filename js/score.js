@@ -29,24 +29,39 @@ export function score(rank, percent, minPercent) {
         return 0;
     }
 
-    // 1. Получаем базовые очки за 100% (P_max)
-    let scoreVal = customPoints[rank];
-    if (scoreVal === undefined) {
-        scoreVal = (-24.9975 * Math.pow(rank - 1, 0.4) + 200);
+    let score;
+
+    // 1. Проверяем, заданы ли свои поинты вручную для этого места
+    if (customPoints[rank] !== undefined) {
+        score = customPoints[rank];
+    } else {
+        // 2. Если ручных поинтов нет — считаем по формуле демонлиста
+        score = (-24.9975 * Math.pow(rank - 1, 0.4) + 200);
     }
 
-    // 2. Если прохождение не 100%, считаем по формуле с картинки
+    // На 41% (minPercent) даёт 25% от полных поинтов (75 для 1 места)
+        const progressRatio = 0.25 + 0.75 * Math.pow((percent - minPercent) / (100 - minPercent), 1.2);
+        score = score * progressRatio;
     if (percent != 100) {
-        const pMax = scoreVal;
-        const pMin = scoreVal * 0.25; // 25% от максимальных очков за минимальный %
-
-        const progressRatio = Math.pow((percent - minPercent) / (100 - minPercent), Math.sqrt(5));
-        scoreVal = pMin + (pMax - pMin) * progressRatio;
+        return round(score - score / 3);
     }
 
-    return round(scoreVal);
+    return Math.max(round(score), 0);
 }
 
-function round(num) {
-    return Math.round(num * Math.pow(10, scale)) / Math.pow(10, scale);
+export function round(num) {
+    if (!('' + num).includes('e')) {
+        return +(Math.round(num + 'e+' + scale) + 'e-' + scale);
+    } else {
+        var arr = ('' + num).split('e');
+        var sig = '';
+        if (+arr[1] + scale > 0) {
+            sig = '+';
+        }
+        return +(
+            Math.round(+arr[0] + 'e' + sig + (+arr[1] + scale)) +
+            'e-' +
+            scale
+        );
+    }
 }
