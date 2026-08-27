@@ -44,9 +44,9 @@ export function score(rank, percent, minPercent) {
         return Math.max(round(score), 0);
     }
 
-    // 4. Формула Global Demonlist с картинки (корень из 5)
+    // 4. Нелинейная формула Global Demonlist с ровно 75 очками на старте (для #1 места)
     const pMax = score;
-    const pMin = score * 0.10; // 10% от макс. очков (как в Pointercrate)
+    const pMin = score * 0.25; // Ровно 25% (75 очков от 300) на минимальном проценте
 
     const progressRatio = Math.pow((percent - minPercent) / (100 - minPercent), Math.sqrt(5));
     const finalScore = pMin + (pMax - pMin) * progressRatio;
