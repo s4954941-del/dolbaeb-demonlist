@@ -21,29 +21,6 @@ const customPoints = {
  * @param {Number} minPercent Minimum percentage required
  * @returns {Number}
  */
-/**
- * Numbers of decimal digits to round to
- */
-const scale = 3;
-
-/**
- * Словарь со своими фиксированными поинтами (номер места: очки).
- * Заполни под свои нужды:
- */
-const customPoints = {
-    1: 300,   // Для 1 места
-    2: 250,   // Для 2 места
-    3: 200,   // Для 3 места
-    // Добавляй свои места по аналогии: 4: 180, 5: 160 и т.д.
-};
-
-/**
- * Calculate the score awarded when having a certain percentage on a list level
- * @param {Number} rank Position on the list
- * @param {Number} percent Percentage of completion
- * @param {Number} minPercent Minimum percentage required
- * @returns {Number}
- */
 export function score(rank, percent, minPercent) {
     if (rank > 150) {
         return 0;
@@ -52,39 +29,24 @@ export function score(rank, percent, minPercent) {
         return 0;
     }
 
-    let score;
-
-    // 1. Проверяем, заданы ли свои поинты вручную для этого места
-    if (customPoints[rank] !== undefined) {
-        score = customPoints[rank];
-    } else {
-        // 2. Если ручных поинтов нет — считаем по формуле демонлиста
-        score = (-24.9975 * Math.pow(rank - 1, 0.4) + 200);
+    // 1. Получаем базовые очки за 100% (P_max)
+    let scoreVal = customPoints[rank];
+    if (scoreVal === undefined) {
+        scoreVal = (-24.9975 * Math.pow(rank - 1, 0.4) + 200);
     }
 
-    // На 41% (minPercent) даёт 25% от полных поинтов (75 для 1 места)
-        const progressRatio = 0.25 + 0.75 * Math.pow((percent - minPercent) / (100 - minPercent), 1.2);
-        score = score * progressRatio;
+    // 2. Если прохождение не 100%, считаем по формуле с картинки
     if (percent != 100) {
-        return round(score - score / 3);
+        const pMax = scoreVal;
+        const pMin = scoreVal * 0.25; // 25% от максимальных очков за минимальный %
+
+        const progressRatio = Math.pow((percent - minPercent) / (100 - minPercent), Math.sqrt(5));
+        scoreVal = pMin + (pMax - pMin) * progressRatio;
     }
 
-    return Math.max(round(score), 0);
+    return round(scoreVal);
 }
 
-export function round(num) {
-    if (!('' + num).includes('e')) {
-        return +(Math.round(num + 'e+' + scale) + 'e-' + scale);
-    } else {
-        var arr = ('' + num).split('e');
-        var sig = '';
-        if (+arr[1] + scale > 0) {
-            sig = '+';
-        }
-        return +(
-            Math.round(+arr[0] + 'e' + sig + (+arr[1] + scale)) +
-            'e-' +
-            scale
-        );
-    }
+function round(num) {
+    return Math.round(num * Math.pow(10, scale)) / Math.pow(10, scale);
 }
