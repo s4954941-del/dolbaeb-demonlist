@@ -4,22 +4,18 @@
 const scale = 3;
 
 /**
- * Словарь со своими фиксированными поинтами (номер места: очки).
- * Заполни под свои нужды:
+ * Словарь с кастомными очками (место: очки)
  */
 const customPoints = {
-    1: 300,   // Для 1 места
-    2: 250,   // Для 2 места
-    3: 200,   // Для 3 места
-    // Добавляй свои места по аналогии: 4: 180, 5: 160 и т.д.
+    1: 300,
+    2: 250,
+    3: 200,
+    4: 150,
+    5: 100
 };
 
 /**
  * Calculate the score awarded when having a certain percentage on a list level
- * @param {Number} rank Position on the list
- * @param {Number} percent Percentage of completion
- * @param {Number} minPercent Minimum percentage required
- * @returns {Number}
  */
 export function score(rank, percent, minPercent) {
     if (rank > 150) {
@@ -35,10 +31,10 @@ export function score(rank, percent, minPercent) {
         scoreVal = (-24.9975 * Math.pow(rank - 1, 0.4) + 200);
     }
 
-    // 2. Если прохождение не 100%, считаем по формуле с картинки
+    // 2. Расчет за прогресс по формуле с корнем из 5
     if (percent != 100) {
         const pMax = scoreVal;
-        const pMin = scoreVal * 0.25; // 25% от максимальных очков за минимальный %
+        const pMin = scoreVal * 0.25;
 
         const progressRatio = Math.pow((percent - minPercent) / (100 - minPercent), Math.sqrt(5));
         scoreVal = pMin + (pMax - pMin) * progressRatio;
@@ -48,5 +44,6 @@ export function score(rank, percent, minPercent) {
 }
 
 function round(num) {
-    return Math.round(num * Math.pow(10, scale)) / Math.pow(10, scale);
+    const factor = Math.pow(10, scale);
+    return Math.round(num * factor) / factor;
 }
